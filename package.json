@@ -1,0 +1,17 @@
+{
+  "name": "sex-bot",
+  "version": "1.0.0",
+  "description": "sex bot frfr",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.1.4",
+    "level": "^8.0.0"
+  }
+}
