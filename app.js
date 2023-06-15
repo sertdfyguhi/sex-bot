@@ -56,7 +56,9 @@ client.on(Events.MessageCreate, async msg => {
       msg.author.id,
       (await getUserSexCount(msg.author.id)) + msg.content.match(/sex/g).length
     );
-  } else if (/^s\.(i|info|sex)(?=\s|$)/.test(msg.content)) {
+  }
+
+  if (/^s\.(i|info|sex)(?=\s|$)/.test(msg.content)) {
     const args = msg.content.split(' ');
 
     // prettier-ignore
