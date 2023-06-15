@@ -9,6 +9,8 @@ import {
 } from 'discord.js';
 import { Level } from 'level';
 
+import keepalive from './keepalive.js';
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -104,4 +106,4 @@ client.on(Events.MessageCreate, async msg => {
   }
 });
 
-client.login(process.env.TOKEN);
+keepalive(client);
