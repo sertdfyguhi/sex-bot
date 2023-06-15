@@ -31,8 +31,17 @@ async function getUserSexCount(id) {
   return count;
 }
 
-client.once(Events.ClientReady, c => {
-  console.log(`bros ${c.user.tag}`);
+client.once(Events.ClientReady, () => {
+  console.log(`bros ${client.user.tag}`);
+
+  client.user.setPresence({
+    activities: [
+      {
+        name: 'run s.sex {mention or id} for sex',
+      },
+    ],
+    status: 'online',
+  });
 });
 
 // client.on(Events.GuildCreate, guild => {
@@ -47,7 +56,7 @@ client.on(Events.MessageCreate, async msg => {
       msg.author.id,
       (await getUserSexCount(msg.author.id)) + msg.content.match(/sex/g).length
     );
-  } else if (/^s\.i(nfo)?(?=\s|$)/.test(msg.content)) {
+  } else if (/^s\.(i|info|sex)(?=\s|$)/.test(msg.content)) {
     const args = msg.content.split(' ');
 
     // prettier-ignore
@@ -55,15 +64,16 @@ client.on(Events.MessageCreate, async msg => {
       args.length >= 2
         ? ( // checks for mention
             msg.mentions.users.size > 0
-              ? msg.mentions.users.first().id
+              ? msg.mentions.users.first()
               : args[1]
           )
         : msg.author.id;
 
-    let guildUser;
+    let user;
 
     try {
-      guildUser = await msg.guild.members.fetch(id);
+      user =
+        typeof id == 'string' ? (await msg.guild.members.fetch(id)).user : id;
     } catch (e) {
       const gif = new AttachmentBuilder(
         'https://media.tenor.com/1J7bXELQMP4AAAAd/kitten.gif'
@@ -81,11 +91,11 @@ client.on(Events.MessageCreate, async msg => {
 
     const embed = new EmbedBuilder()
       .setAuthor({
-        name: guildUser.user.tag,
-        iconURL: guildUser.user.avatarURL(),
+        name: user.tag,
+        iconURL: user.avatarURL(),
       })
       .setTitle('Sex Count')
-      .setDescription((await getUserSexCount(id)).toString())
+      .setDescription((await getUserSexCount(user.id)).toString())
       .setColor('Random');
 
     msg.channel.send({ embeds: [embed] });
