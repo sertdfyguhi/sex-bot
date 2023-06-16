@@ -1,15 +1,13 @@
 import 'dotenv/config';
 
-import {
-  Client,
-  Events,
-  GatewayIntentBits,
-  EmbedBuilder,
-  AttachmentBuilder,
-} from 'discord.js';
-import { Level } from 'level';
+import { Client, Events, GatewayIntentBits } from 'discord.js';
+import { readdirSync } from 'node:fs';
 
+import { Database } from './database.js';
 import keepalive from './keepalive.js';
+import { getUserSexCount } from './commands/utils.js';
+
+const PREFIX = 's.';
 
 const client = new Client({
   intents: [
@@ -19,18 +17,32 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
   ],
 });
-const db = new Level('database/', { valueEncoding: 'json' });
+const db = new Database('database.json');
 
-async function getUserSexCount(id) {
-  let count;
+// write to file before exiting
+for (const signal of ['SIGINT', 'SIGUSR1', 'SIGUSR2']) {
+  process.on(signal, () => {
+    console.log('writing to db..');
+    db.write();
+    process.exit();
+  });
+}
 
-  try {
-    count = await db.get(id);
-  } catch (e) {
-    count = 0;
+// load commands
+let commands = {};
+
+for (const file of readdirSync('./commands/')) {
+  if (file == 'utils.js') continue;
+
+  const command = (await import(`./commands/${file}`)).default;
+
+  if (Array.isArray(command.name)) {
+    for (const name of command.name) {
+      commands[name] = command.command;
+    }
+  } else {
+    commands[command.name] = command.command;
   }
-
-  return count;
 }
 
 client.once(Events.ClientReady, () => {
@@ -54,55 +66,19 @@ client.on(Events.MessageCreate, async msg => {
   if (msg.content.includes('sex')) {
     console.log(`sex erected by ${msg.author.tag}`);
 
-    await db.put(
-      msg.author.id,
-      (await getUserSexCount(msg.author.id)) + msg.content.match(/sex/g).length
-    );
+    await db.set(msg.author.id, {
+      tag: msg.author.tag,
+      count:
+        getUserSexCount(db, msg.author.id) + msg.content.match(/sex/g).length,
+    });
   }
 
-  if (/^s\.(i|info|sex)(?=\s|$)/.test(msg.content)) {
-    const args = msg.content.split(' ');
+  if (msg.content.startsWith(PREFIX)) {
+    const args = msg.content.substring(2).split(' ');
 
-    // prettier-ignore
-    const id =
-      args.length >= 2
-        ? ( // checks for mention
-            msg.mentions.users.size > 0
-              ? msg.mentions.users.first()
-              : args[1]
-          )
-        : msg.author.id;
-
-    let user;
-
-    try {
-      user =
-        typeof id == 'string' ? (await msg.guild.members.fetch(id)).user : id;
-    } catch (e) {
-      const gif = new AttachmentBuilder(
-        'https://media.tenor.com/1J7bXELQMP4AAAAd/kitten.gif'
-      );
-
-      msg.channel.send({
-        content: `error: sex (${id}) not found.`,
-        files: [gif],
-      });
-
-      return;
+    if (args[0] in commands) {
+      commands[args[0]](db, msg, args);
     }
-
-    // console.log(guildUser);
-
-    const embed = new EmbedBuilder()
-      .setAuthor({
-        name: user.tag,
-        iconURL: user.avatarURL(),
-      })
-      .setTitle('Sex Count')
-      .setDescription((await getUserSexCount(user.id)).toString())
-      .setColor('Random');
-
-    msg.channel.send({ embeds: [embed] });
   }
 });
 
