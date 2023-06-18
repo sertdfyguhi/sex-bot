@@ -21,9 +21,9 @@ const db = new Database('database.json');
 
 // write to file before exiting
 for (const signal of ['SIGINT', 'SIGUSR1', 'SIGUSR2']) {
-  process.on(signal, () => {
+  process.on(signal, async () => {
     console.log('writing to db..');
-    db.write();
+    await db.write();
     process.exit();
   });
 }
@@ -66,11 +66,14 @@ client.on(Events.MessageCreate, async msg => {
   if (msg.content.includes('sex')) {
     console.log(`sex erected by ${msg.author.tag}`);
 
-    await db.set(msg.author.id, {
+    db.set(msg.author.id, {
       tag: msg.author.tag,
       count:
         getUserSexCount(db, msg.author.id) + msg.content.match(/sex/g).length,
     });
+
+    // write to db (repl is garbage)
+    await db.write();
   }
 
   if (msg.content.startsWith(PREFIX)) {

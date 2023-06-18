@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFile } from 'node:fs';
 
 export class Database {
   constructor(path) {
@@ -23,7 +23,7 @@ export class Database {
     delete this.json[key];
   }
 
-  write() {
-    writeFileSync(this.path, JSON.stringify(this.json));
+  async write() {
+    await writeFile(this.path, JSON.stringify(this.json));
   }
 }
