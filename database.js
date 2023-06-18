@@ -23,7 +23,7 @@ export class Database {
     delete this.json[key];
   }
 
-  async write() {
-    await writeFile(this.path, JSON.stringify(this.json));
+  write(callback = () => {}) {
+    writeFile(this.path, JSON.stringify(this.json), callback);
   }
 }

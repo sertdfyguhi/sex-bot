@@ -21,9 +21,9 @@ const db = new Database('database.json');
 
 // write to file before exiting
 for (const signal of ['SIGINT', 'SIGUSR1', 'SIGUSR2']) {
-  process.on(signal, async () => {
+  process.on(signal, () => {
     console.log('writing to db..');
-    await db.write();
+    db.write();
     process.exit();
   });
 }
@@ -73,7 +73,7 @@ client.on(Events.MessageCreate, async msg => {
     });
 
     // write to db (repl is garbage)
-    await db.write();
+    db.write();
   }
 
   if (msg.content.startsWith(PREFIX)) {
