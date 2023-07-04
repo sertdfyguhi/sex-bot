@@ -20,13 +20,13 @@ const client = new Client({
 const db = new Database('database.json');
 
 // write to file before exiting
-for (const signal of ['SIGINT', 'SIGUSR1', 'SIGUSR2']) {
-  process.on(signal, () => {
-    console.log('writing to db..');
-    db.write();
-    process.exit();
-  });
-}
+// for (const signal of ['SIGINT', 'SIGUSR1', 'SIGUSR2']) {
+//   process.on(signal, () => {
+//     console.log('writing to db..');
+//     db.write();
+//     process.exit();
+//   });
+// }
 
 // load commands
 let commands = {};
@@ -57,10 +57,6 @@ client.once(Events.ClientReady, () => {
     status: 'online',
   });
 });
-
-// client.on(Events.GuildCreate, guild => {
-
-// })
 
 client.on(Events.MessageCreate, async msg => {
   if (msg.content.includes('sex')) {
