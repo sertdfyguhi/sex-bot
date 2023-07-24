@@ -1,3 +1,3 @@
 export function getUserSexCount(db, id) {
-  return (db.get(id) || { count: 0 }).count;
+  return db.get(id).count || 0;
 }

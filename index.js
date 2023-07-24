@@ -8,6 +8,7 @@ import keepalive from './keepalive.js';
 import { getUserSexCount } from './commands/utils.js';
 
 const PREFIX = 's.';
+const ENCOURAGEMENT_MSG_CHANCE = 1 / 6;
 
 const client = new Client({
   intents: [
@@ -60,12 +61,16 @@ client.once(Events.ClientReady, () => {
 
 client.on(Events.MessageCreate, async msg => {
   if (msg.content.includes('sex')) {
-    console.log(`sex erected by ${msg.author.tag}`);
+    const sexCount = msg.content.match(/sex/g).length;
+
+    if (sexCount > 400 && Math.random() < ENCOURAGEMENT_MSG_CHANCE)
+      msg.reply('bro is POUNCING up the leaderboards 🔥🔥🔥');
+
+    console.log(`${sexCount} sexes erected by ${msg.author.tag}`);
 
     db.set(msg.author.id, {
       tag: msg.author.tag,
-      count:
-        getUserSexCount(db, msg.author.id) + msg.content.match(/sex/g).length,
+      count: getUserSexCount(db, msg.author.id) + sexCount,
     });
 
     // write to db (repl is garbage)
@@ -78,6 +83,22 @@ client.on(Events.MessageCreate, async msg => {
     if (args[0] in commands) {
       commands[args[0]](db, msg, args);
     }
+  }
+});
+
+client.on(Events.MessageDelete, async msg => {
+  if (msg.content.includes('sex')) {
+    const sexCount = msg.content.match(/sex/g).length;
+
+    console.log(`${sexCount} sexes flaccided by ${msg.author.tag}`);
+
+    db.set(msg.author.id, {
+      tag: msg.author.tag,
+      count: getUserSexCount(db, msg.author.id) - sexCount,
+    });
+
+    // write to db (repl is garbage)
+    db.write();
   }
 });
 
