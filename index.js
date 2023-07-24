@@ -8,7 +8,12 @@ import keepalive from './keepalive.js';
 import { getUserSexCount } from './commands/utils.js';
 
 const PREFIX = 's.';
-const ENCOURAGEMENT_MSG_CHANCE = 1 / 6;
+const ENCOURAGEMENT_MSGS = [
+  'bro is POUNCING up the leaderboards 🔥🔥🔥',
+  'top 1 in NO time 🗣️🗣️🗣️🆙🆙🔥🔥🔥',
+  'bro is on FIRE 🔥🔥🔥🔥',
+];
+const ENCOURAGEMENT_MSG_CHANCE = 1 / 5;
 
 const client = new Client({
   intents: [
@@ -63,8 +68,10 @@ client.on(Events.MessageCreate, async msg => {
   if (msg.content.includes('sex')) {
     const sexCount = msg.content.match(/sex/g).length;
 
-    if (sexCount > 400 && Math.random() < ENCOURAGEMENT_MSG_CHANCE)
-      msg.reply('bro is POUNCING up the leaderboards 🔥🔥🔥');
+    if (sexCount > 400 && Math.random() < ENCOURAGEMENT_MSG_CHANCE) {
+      const index = Math.round(Math.random() * ENCOURAGEMENT_MSGS.length);
+      msg.reply(ENCOURAGEMENT_MSGS[index]);
+    }
 
     console.log(`${sexCount} sexes erected by ${msg.author.tag}`);
 
