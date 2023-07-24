@@ -69,7 +69,7 @@ client.on(Events.MessageCreate, async msg => {
     const sexCount = msg.content.match(/sex/g).length;
 
     if (sexCount > 400 && Math.random() < ENCOURAGEMENT_MSG_CHANCE) {
-      const index = Math.round(Math.random() * ENCOURAGEMENT_MSGS.length);
+      const index = Math.round(Math.random() * (ENCOURAGEMENT_MSGS.length - 1));
       msg.reply(ENCOURAGEMENT_MSGS[index]);
     }
 
