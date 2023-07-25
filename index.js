@@ -5,7 +5,7 @@ import { readdirSync } from 'node:fs';
 
 import { Database } from './database.js';
 import keepalive from './keepalive.js';
-import { getUserSexCount } from './commands/utils.js';
+import * as utils from './commands/utils.js';
 
 const PREFIX = 's.';
 const ENCOURAGEMENT_MSGS = [
@@ -76,8 +76,8 @@ client.on(Events.MessageCreate, async msg => {
     console.log(`${sexCount} sexes erected by ${msg.author.tag}`);
 
     db.set(msg.author.id, {
-      tag: msg.author.tag,
-      count: getUserSexCount(db, msg.author.id) + sexCount,
+      tag: utils.getTag(msg.author),
+      count: utils.getUserSexCount(db, msg.author.id) + sexCount,
     });
 
     // write to db (repl is garbage)
@@ -101,7 +101,7 @@ client.on(Events.MessageDelete, async msg => {
 
     db.set(msg.author.id, {
       tag: msg.author.tag,
-      count: getUserSexCount(db, msg.author.id) - sexCount,
+      count: utils.getUserSexCount(db, msg.author.id) - sexCount,
     });
 
     // write to db (repl is garbage)

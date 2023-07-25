@@ -1,5 +1,5 @@
 import { EmbedBuilder, AttachmentBuilder } from 'discord.js';
-import { getUserSexCount } from './utils.js';
+import * as utils from './utils.js';
 
 export default {
   name: ['i', 'info', 'sex'],
@@ -36,11 +36,11 @@ export default {
 
     const embed = new EmbedBuilder()
       .setAuthor({
-        name: user.tag,
+        name: utils.getTag(user),
         iconURL: user.avatarURL(),
       })
       .setTitle('Sex Count')
-      .setDescription(getUserSexCount(db, user.id).toString())
+      .setDescription(utils.getUserSexCount(db, user.id).toString())
       .setColor('Random');
 
     msg.channel.send({ embeds: [embed] });
