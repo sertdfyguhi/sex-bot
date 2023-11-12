@@ -1,19 +1,24 @@
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder } from "discord.js";
 
 export default {
-  name: ['lb', 'leaderboard'],
+  name: ["lb", "leaderboard"],
   command: async (db, msg, args) => {
-    let leaderboard = [];
-
-    for (const v of Object.values(db.json).sort((a, b) => b.count - a.count)) {
-      if (leaderboard.length == 10) break;
-      leaderboard.push(`${leaderboard.length + 1}. ${v.tag}: ${v.count}`);
-    }
-
     const embed = new EmbedBuilder()
-      .setTitle('Sex Leaderboard')
-      .setDescription(leaderboard.join('\n') || 'none')
-      .setColor('Random');
+      .setTitle("Sex Leaderboard")
+      .setColor("Random");
+
+    // values of database sorted in descending order based on count
+    const leaderboard = Object.values(db.json)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    embed.addFields(
+      leaderboard.map((rank, i) => ({
+        name: `#${i + 1}: ${rank.tag}`,
+        value: rank.count.toString(),
+        inline: true,
+      }))
+    );
 
     msg.channel.send({ embeds: [embed] });
   },
