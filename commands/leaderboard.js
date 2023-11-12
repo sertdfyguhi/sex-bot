@@ -77,7 +77,7 @@ export default {
         if (page <= 1) return;
         page--;
       } else {
-        if (page > page_max) return;
+        if (page >= page_max) return;
         page++;
       }
 
