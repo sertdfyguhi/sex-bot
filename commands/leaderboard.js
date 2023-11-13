@@ -36,6 +36,7 @@ function make_leaderboard_embed(leaderboard, page = 1) {
 
 export default {
   name: ["lb", "leaderboard"],
+  description: "shows the top sex counts",
   command: async (db, msg, args) => {
     // define buttons
     const prev_page_btn = new ButtonBuilder()

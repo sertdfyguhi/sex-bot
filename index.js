@@ -1,17 +1,17 @@
-import 'dotenv/config';
+import "dotenv/config";
 
-import { Client, Events, GatewayIntentBits } from 'discord.js';
-import { readdirSync } from 'node:fs';
+import { Client, EmbedBuilder, Events, GatewayIntentBits } from "discord.js";
+import { readdirSync } from "node:fs";
 
-import { Database } from './database.js';
-import keepalive from './keepalive.js';
-import * as utils from './commands/utils.js';
+import { Database } from "./database.js";
+import keepalive from "./keepalive.js";
+import * as utils from "./utils.js";
 
-const PREFIX = 's.';
+const PREFIX = "s.";
 const ENCOURAGEMENT_MSGS = [
-  'bro is POUNCING up the leaderboards 🔥🔥🔥',
-  'top 1 in NO time 🗣️🗣️🗣️🆙🆙🔥🔥🔥',
-  'bro is on FIRE 🔥🔥🔥🔥',
+  "bro is POUNCING up the leaderboards 🔥🔥🔥",
+  "top 1 in NO time 🗣️🗣️🗣️🆙🆙🔥🔥🔥",
+  "bro is on FIRE 🔥🔥🔥🔥",
 ];
 const ENCOURAGEMENT_MSG_CHANCE = 1 / 5;
 
@@ -23,7 +23,7 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
   ],
 });
-const db = new Database('database.json');
+const db = new Database("database.json");
 
 // write to file before exiting
 // for (const signal of ['SIGINT', 'SIGUSR1', 'SIGUSR2']) {
@@ -35,20 +35,31 @@ const db = new Database('database.json');
 // }
 
 // load commands
-let commands = {};
+const commands = await Promise.all(
+  readdirSync("./commands/").map(
+    async (file) => (await import(`./commands/${file}`)).default
+  )
+);
 
-for (const file of readdirSync('./commands/')) {
-  if (file == 'utils.js') continue;
-
-  const command = (await import(`./commands/${file}`)).default;
-
-  if (Array.isArray(command.name)) {
-    for (const name of command.name) {
-      commands[name] = command.command;
+/**
+ * Gets a command.
+ * @param {string} name
+ * @returns {Object|null}
+ */
+function getCommand(name) {
+  for (const command of commands) {
+    if (typeof command.name == "string") {
+      if (command.name == name) {
+        return command;
+      }
+    } else {
+      if (command.name.includes(name)) {
+        return command;
+      }
     }
-  } else {
-    commands[command.name] = command.command;
   }
+
+  return null;
 }
 
 client.once(Events.ClientReady, () => {
@@ -57,15 +68,15 @@ client.once(Events.ClientReady, () => {
   client.user.setPresence({
     activities: [
       {
-        name: 'run s.sex {mention or id} for sex',
+        name: "run s.sex {mention or id} for sex",
       },
     ],
-    status: 'online',
+    status: "online",
   });
 });
 
-client.on(Events.MessageCreate, async msg => {
-  if (msg.content.includes('sex')) {
+client.on(Events.MessageCreate, async (msg) => {
+  if (msg.content.includes("sex")) {
     const sexCount = msg.content.match(/sex/g).length;
 
     if (sexCount > 400 && Math.random() < ENCOURAGEMENT_MSG_CHANCE) {
@@ -85,16 +96,37 @@ client.on(Events.MessageCreate, async msg => {
   }
 
   if (msg.content.startsWith(PREFIX)) {
-    const args = msg.content.substring(2).split(' ');
+    const args = msg.content.substring(2).split(" ");
 
-    if (args[0] in commands) {
-      commands[args[0]](db, msg, args);
+    if (args[0] == "help") {
+      const embed = new EmbedBuilder()
+        .setAuthor({
+          name: "Help",
+          iconURL: msg.author.avatarURL(),
+        })
+        .setTitle("Commands")
+        .addFields(
+          commands.map((command) => ({
+            name:
+              // command could have multiple names
+              typeof command.name == "string"
+                ? `${PREFIX}${command.name}`
+                : command.name.map((cmd) => `${PREFIX}${cmd}`).join(", "),
+            value: command.description,
+            inline: true,
+          }))
+        );
+
+      await msg.channel.send({ embeds: [embed] });
+    } else {
+      const command = getCommand(args[0]);
+      if (command) command.command(db, msg, args);
     }
   }
 });
 
-client.on(Events.MessageDelete, async msg => {
-  if (msg.content.includes('sex')) {
+client.on(Events.MessageDelete, async (msg) => {
+  if (msg.content.includes("sex")) {
     const sexCount = msg.content.match(/sex/g).length;
 
     console.log(`${sexCount} sexes flaccided by ${msg.author.tag}`);

@@ -1,7 +1,10 @@
+import { ButtonBuilder, ActionRowBuilder, ButtonStyle } from "discord.js";
+
 export default {
-  name: 'reset',
+  name: "reset",
+  description: "resets your sex count",
   command: async (db, msg, args) => {
-    if (msg.author.id === '960911499621179402') {
+    if (msg.author.id === "960911499621179402") {
       const id =
         args.length >= 2
           ? // checks for mention
@@ -13,6 +16,48 @@ export default {
       db.delete(id);
       msg.reply(`get resetted <@${id}> 🤣`);
       db.write();
+    } else {
+      const no_btn = new ButtonBuilder()
+        .setCustomId("no")
+        .setLabel("❌")
+        .setStyle(ButtonStyle.Danger);
+
+      const yes_btn = new ButtonBuilder()
+        .setCustomId("yes")
+        .setLabel("✅")
+        .setStyle(ButtonStyle.Success);
+
+      const btn_row = new ActionRowBuilder().addComponents(no_btn, yes_btn);
+      const response = await msg.reply({
+        content: "Are you sure you want to reset your sex count? (❌/✅)",
+        components: [btn_row],
+      });
+
+      try {
+        const confirmation = await response.awaitMessageComponent({
+          filter: (interaction) => interaction.user.id == msg.author.id,
+          time: 1000 * 60,
+        });
+
+        if (confirmation.customId === "yes") {
+          db.delete(msg.author.id);
+
+          await confirmation.update({
+            content: `Sex count for ${msg.author} resetted.`,
+            components: [],
+          });
+        } else {
+          await confirmation.update({
+            content: "Reset cancelled.",
+            components: [],
+          });
+        }
+      } catch (e) {
+        await confirmation.update({
+          content: "Confirmation not received in a minute, reset cancelled.",
+          components: [],
+        });
+      }
     }
   },
 };

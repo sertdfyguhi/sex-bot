@@ -1,8 +1,9 @@
-import { EmbedBuilder, AttachmentBuilder } from 'discord.js';
-import * as utils from './utils.js';
+import { EmbedBuilder, AttachmentBuilder } from "discord.js";
+import * as utils from "../utils.js";
 
 export default {
-  name: ['i', 'info', 'sex'],
+  name: ["i", "info", "sex"],
+  description: "gets the sex count of the provided user",
   command: async (db, msg, args) => {
     // prettier-ignore
     const id =
@@ -18,10 +19,10 @@ export default {
 
     try {
       user =
-        typeof id == 'string' ? (await msg.guild.members.fetch(id)).user : id;
+        typeof id == "string" ? (await msg.guild.members.fetch(id)).user : id;
     } catch (e) {
       const gif = new AttachmentBuilder(
-        'https://media.tenor.com/1J7bXELQMP4AAAAd/kitten.gif'
+        "https://media.tenor.com/1J7bXELQMP4AAAAd/kitten.gif"
       );
 
       msg.channel.send({
@@ -39,9 +40,9 @@ export default {
         name: utils.getTag(user),
         iconURL: user.avatarURL(),
       })
-      .setTitle('Sex Count')
+      .setTitle("Sex Count")
       .setDescription(utils.getUserSexCount(db, user.id).toString())
-      .setColor('Random');
+      .setColor("Random");
 
     msg.channel.send({ embeds: [embed] });
   },
