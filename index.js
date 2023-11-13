@@ -105,6 +105,9 @@ client.on(Events.MessageCreate, async (msg) => {
           iconURL: msg.author.avatarURL(),
         })
         .setTitle("Commands")
+        .setFooter({
+          text: "Made by sertdfyguhi. Source code at https://github.com/sertdfyguhi/sex-bot.",
+        })
         .addFields(
           commands.map((command) => ({
             name:
