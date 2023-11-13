@@ -73,7 +73,7 @@ export default {
     });
     let page = 1;
 
-    collector.on("collect", async (interaction) => {
+    collector.on("collect", async interaction => {
       if (interaction.customId == "previous") {
         if (page <= 1) return;
         page--;

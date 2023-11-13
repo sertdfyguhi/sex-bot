@@ -37,7 +37,7 @@ export default {
 
       try {
         const confirmation = await response.awaitMessageComponent({
-          filter: (interaction) => interaction.user.id == msg.author.id,
+          filter: interaction => interaction.user.id == msg.author.id,
           time: 1000 * 60,
         });
 

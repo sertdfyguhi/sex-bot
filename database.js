@@ -1,4 +1,4 @@
-import { readFileSync, writeFile } from 'node:fs';
+import { readFileSync, writeFile } from "node:fs";
 
 export class Database {
   constructor(path) {

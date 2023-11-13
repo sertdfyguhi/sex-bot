@@ -37,7 +37,7 @@ const db = new Database("database.json");
 // load commands
 const commands = await Promise.all(
   readdirSync("./commands/").map(
-    async (file) => (await import(`./commands/${file}`)).default
+    async file => (await import(`./commands/${file}`)).default
   )
 );
 
@@ -73,7 +73,7 @@ client.once(Events.ClientReady, () => {
   });
 });
 
-client.on(Events.MessageCreate, async (msg) => {
+client.on(Events.MessageCreate, async msg => {
   if (msg.content.includes("sex")) {
     const sexCount = msg.content.match(/sex/g).length;
 
@@ -108,12 +108,12 @@ client.on(Events.MessageCreate, async (msg) => {
         })
         .setColor("Random")
         .addFields(
-          commands.map((command) => ({
+          commands.map(command => ({
             name:
               // command could have multiple names
               typeof command.name == "string"
                 ? `${PREFIX}${command.name}`
-                : command.name.map((cmd) => `${PREFIX}${cmd}`).join(", "),
+                : command.name.map(cmd => `${PREFIX}${cmd}`).join(", "),
             value: command.description,
             inline: true,
           }))
@@ -127,7 +127,7 @@ client.on(Events.MessageCreate, async (msg) => {
   }
 });
 
-client.on(Events.MessageDelete, async (msg) => {
+client.on(Events.MessageDelete, async msg => {
   if (msg.content.includes("sex")) {
     const sexCount = msg.content.match(/sex/g).length;
 
