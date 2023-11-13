@@ -44,20 +44,14 @@ const commands = await Promise.all(
 /**
  * Gets a command.
  * @param {string} name
- * @returns {Object|null}
+ * @returns {Object|undefined}
  */
 function getCommand(name) {
-  for (const command of commands) {
-    // check if provided name is equal or in command name(s)
-    if (
-      typeof command.name == "string"
-        ? command.name == name
-        : command.name.includes(name)
-    )
-      return command;
-  }
-
-  return null;
+  return commands.find(command =>
+    typeof command.name == "string"
+      ? command.name == name
+      : command.name.includes(name)
+  );
 }
 
 client.once(Events.ClientReady, () => {
