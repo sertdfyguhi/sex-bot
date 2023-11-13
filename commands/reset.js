@@ -4,7 +4,7 @@ export default {
   name: "reset",
   description: "resets your sex count",
   command: async (db, msg, args) => {
-    if (msg.author.id === "960911499621179402") {
+    if (msg.author.id === "1161090382227046470") {
       const id =
         args.length >= 2
           ? // checks for mention
