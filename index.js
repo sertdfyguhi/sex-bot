@@ -48,15 +48,13 @@ const commands = await Promise.all(
  */
 function getCommand(name) {
   for (const command of commands) {
-    if (typeof command.name == "string") {
-      if (command.name == name) {
-        return command;
-      }
-    } else {
-      if (command.name.includes(name)) {
-        return command;
-      }
-    }
+    // check if provided name is equal or in command name(s)
+    if (
+      typeof command.name == "string"
+        ? command.name == name
+        : command.name.includes(name)
+    )
+      return command;
   }
 
   return null;
@@ -108,6 +106,7 @@ client.on(Events.MessageCreate, async (msg) => {
         .setFooter({
           text: "Made by sertdfyguhi. Source code at https://github.com/sertdfyguhi/sex-bot.",
         })
+        .setColor("Random")
         .addFields(
           commands.map((command) => ({
             name:
