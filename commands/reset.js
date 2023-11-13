@@ -4,6 +4,7 @@ export default {
   name: "reset",
   description: "resets your sex count",
   command: async (db, msg, args) => {
+    // check if bot author sent commadn
     if (msg.author.id === "1161090382227046470") {
       const id =
         args.length >= 2
@@ -17,6 +18,7 @@ export default {
       msg.reply(`get resetted <@${id}> 🤣`);
       db.write();
     } else {
+      // define buttons
       const no_btn = new ButtonBuilder()
         .setCustomId("no")
         .setLabel("❌")
@@ -54,6 +56,7 @@ export default {
           });
         }
       } catch (e) {
+        // if confirmation timeout is exceeded
         await confirmation.update({
           content: "Confirmation not received in a minute, reset cancelled.",
           components: [],
