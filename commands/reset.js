@@ -41,6 +41,7 @@ export default {
 
         if (confirmation.customId === "yes") {
           db.delete(msg.author.id);
+          db.write();
 
           await confirmation.update({
             content: `Sex count for ${msg.author} resetted.`,
