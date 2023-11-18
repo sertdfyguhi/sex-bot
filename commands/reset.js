@@ -1,22 +1,25 @@
 import { ButtonBuilder, ActionRowBuilder, ButtonStyle } from "discord.js";
+import { getUserFromMessage } from "../utils.js";
 
 export default {
   name: "reset",
   description: "resets your sex count",
+
+  /**
+   * Command callback.
+   * @param {import("../database.js").Database} db
+   * @param {import("discord.js").Message} msg
+   * @param {Array} args
+   */
   command: async (db, msg, args) => {
     // check if bot author sent commadn
     if (msg.author.id === "1161090382227046470") {
-      const id =
-        args.length >= 2
-          ? // checks for mention
-            msg.mentions.users.size > 0
-            ? msg.mentions.users.first().id
-            : args[1]
-          : msg.author.id;
+      const id = await getUserFromMessage(msg, args, true);
 
-      db.delete(id);
-      msg.reply(`get resetted <@${id}> 🤣`);
+      db.resetSexCount(msg.guildId, id);
       db.write();
+
+      msg.reply(`Resetted <@${id}>'s sex count. 🤣`);
     } else {
       // define buttons
       const no_btn = new ButtonBuilder()
@@ -42,7 +45,7 @@ export default {
         });
 
         if (confirmation.customId === "yes") {
-          db.delete(msg.author.id);
+          db.resetSexCount(msg.guildId, msg.author.id);
           db.write();
 
           await confirmation.update({

@@ -5,7 +5,7 @@ import { readdirSync } from "node:fs";
 
 import { Database } from "./database.js";
 import keepalive from "./keepalive.js";
-import * as utils from "./utils.js";
+import { getTag } from "./utils.js";
 
 const PREFIX = "s.";
 const ENCOURAGEMENT_MSGS = [
@@ -68,6 +68,9 @@ client.once(Events.ClientReady, () => {
 });
 
 client.on(Events.MessageCreate, async msg => {
+  // skip dm and group messages
+  if (msg.guild === null) return;
+
   if (msg.content.includes("sex")) {
     const sexCount = msg.content.match(/sex/g).length;
 
@@ -78,12 +81,12 @@ client.on(Events.MessageCreate, async msg => {
 
     console.log(`${sexCount} sexes erected by ${msg.author.tag}`);
 
-    db.set(msg.author.id, {
-      tag: utils.getTag(msg.author),
-      count: utils.getUserSexCount(db, msg.author.id) + sexCount,
-    });
-
-    // write to db (repl is garbage)
+    db.incrementUserCount(
+      msg.guildId,
+      msg.author.id,
+      getTag(msg.author),
+      sexCount
+    );
     db.write();
   }
 
@@ -116,6 +119,8 @@ client.on(Events.MessageCreate, async msg => {
       await msg.channel.send({ embeds: [embed] });
     } else {
       const command = getCommand(args[0]);
+      args.shift();
+
       if (command) command.command(db, msg, args);
     }
   }
@@ -127,10 +132,12 @@ client.on(Events.MessageDelete, async msg => {
 
     console.log(`${sexCount} sexes flaccided by ${msg.author.tag}`);
 
-    db.set(msg.author.id, {
-      tag: msg.author.tag,
-      count: utils.getUserSexCount(db, msg.author.id) - sexCount,
-    });
+    db.decrementUserCount(
+      msg.guildId,
+      msg.author.id,
+      getTag(msg.author),
+      sexCount
+    );
 
     // write to db (repl is garbage)
     db.write();

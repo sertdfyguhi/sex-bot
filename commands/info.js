@@ -4,36 +4,24 @@ import * as utils from "../utils.js";
 export default {
   name: ["i", "info", "sex"],
   description: "gets the sex count of the provided user",
+
+  /**
+   * Command callback.
+   * @param {import("../database.js").Database} db
+   * @param {import("discord.js").Message} msg
+   * @param {Array} args
+   */
   command: async (db, msg, args) => {
-    // prettier-ignore
-    const id =
-      args.length >= 2
-        ? ( // checks for mention
-            msg.mentions.users.size > 0
-              ? msg.mentions.users.first()
-              : args[1]
-          )
-        : msg.author.id;
-
-    let user;
-
-    try {
-      user =
-        typeof id == "string" ? (await msg.guild.members.fetch(id)).user : id;
-    } catch (e) {
-      const gif = new AttachmentBuilder(
-        "https://media.tenor.com/1J7bXELQMP4AAAAd/kitten.gif"
-      );
-
-      msg.channel.send({
-        content: `error: sex (${id}) not found.`,
-        files: [gif],
+    const user = await utils.getUserFromMessage(msg, args);
+    if (!user)
+      return msg.channel.send({
+        content: `Error: Sex (${args[0]}) not found.`,
+        files: [
+          new AttachmentBuilder(
+            "https://media.tenor.com/1J7bXELQMP4AAAAd/kitten.gif"
+          ),
+        ],
       });
-
-      return;
-    }
-
-    // console.log(guildUser);
 
     const embed = new EmbedBuilder()
       .setAuthor({
@@ -41,7 +29,7 @@ export default {
         iconURL: user.avatarURL(),
       })
       .setTitle("Sex Count")
-      .setDescription(utils.getUserSexCount(db, user.id).toString())
+      .setDescription(db.getUserCount(msg.guildId, user.id).toString())
       .setColor("Random");
 
     msg.channel.send({ embeds: [embed] });
